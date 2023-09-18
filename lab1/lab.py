@@ -76,19 +76,18 @@ for func, i in zip(funcs, range(1, 6)):
         y = [calc_diff(x, h, method, func) for h in steps]
         y_list.append(y)
     
-    plt.title("function = " + func.name)
+    plt.title("function = " + func.name + " (x = " + str(x) + ")")
     plt.ylabel("Absolute error(log)")
     plt.xlabel("Step value(log)")
     
     plt.minorticks_on()
     plt.grid(which='major')
     plt.grid(which='minor', linestyle=':')
-    
-    plt.semilogx()
-    plt.semilogy()
-    
-    plt.plot(steps, y_list[0], '-', steps, y_list[1], '--', steps, y_list[2], '-.', steps, \
-             y_list[3], ':', steps, y_list[4])
+
+    plt.plot(np.log(steps), np.log(y_list[0]), '-', np.log(steps), np.log(y_list[1]), '--', \
+             np.log(steps), np.log(y_list[2]), '-.', np.log(steps), np.log(y_list[3]), ':', \
+             np.log(steps), np.log(y_list[4]))
+    plt.legend(('method1', 'method2', 'method3', 'method4', 'method5'))
     
     plt.savefig("graphs/funcGraph" + str(i) + ".png")
     plt.show()
