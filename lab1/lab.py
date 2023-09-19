@@ -89,5 +89,5 @@ for func, i in zip(funcs, range(1, 6)):
              np.log(steps), np.log(y_list[4]))
     plt.legend(('method1', 'method2', 'method3', 'method4', 'method5'))
     
-    plt.savefig("graphs/funcGraph" + str(i) + ".png")
+    plt.savefig("images/graphs/funcGraph" + str(i) + ".png")
     plt.show()
