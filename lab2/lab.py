@@ -161,9 +161,6 @@ class Matrix:
         ]
         return Matrix(inverse)
 
-    #def calc_det
-    #def calc_own_values
-    #def calc_own_vectors
 
 # Gauss method
 def solveGauss(matrix_in: Matrix, right_side_in: list):
@@ -295,12 +292,11 @@ def solveSeidel(matrix_in: Matrix, right_side: list, iter_amnt: int, answer: lis
     return X
 
  
-n = 3
+n = 10
 matrix = Matrix(n, n, lambda i, j: 1 * (j == i) + (1 / (j + i)) * (i != j))
 right_side = [1 / i for i in range(1, n + 1)]
 
 resGauss = solveGauss(matrix, right_side)
-print()
 
 resJacobi = solveJacobi(matrix, right_side, 20, resGauss)
 resSeidel = solveSeidel(matrix, right_side, 20, resGauss)
