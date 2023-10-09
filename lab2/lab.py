@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import copy 
 
 class Matrix:
-    def __init__(self, *args): #hight, width, elem_init):
+    def __init__(self, *args):
         if len(args) > 1:
             self.data = []
             self.hight = args[0]
@@ -201,8 +201,9 @@ def solveGauss(matrix_in: Matrix, right_side_in: list):
             matrix.data[j][i] = 0
     
     return solutions
-    
-def solveJacobi(matrix_in: Matrix, right_side: list):
+
+# Return Lower triangular, Upper triangular and Diagonal matrices
+def decomposeMatrix(matrix_in: Matrix):
     # L- Lower triangular matrix
     L = copy.deepcopy(matrix_in)
     # D - Diagonal matrix
@@ -219,17 +220,87 @@ def solveJacobi(matrix_in: Matrix, right_side: list):
                 D.data[i][j] = 0
                 D.data[j][i] = 0
 
+    return L, U, D
+
+    
+def solveJacobi(matrix_in: Matrix, right_side: list, iter_amnt: int, answer: list = None):
+    L, U, D = decomposeMatrix(matrix_in)
     R = (D ** (-1)) * (-1) * (L + U)
     F = (D ** (-1)) * right_side
+    X = [1 for i in range(L.width)] 
+
+    iterations = [i for i in range(1, iter_amnt + 1)]
+    diff = []
+
+    for i in range(iter_amnt):
+        tmp = R * X
+        for i in range(L.width):
+            X[i] = tmp[i] + F[i]
+
+        if answer != None:
+            diff_tmp = 0
+            for i in range(L.width):
+                diff_tmp += (X[i] - answer[i]) ** 2
+            diff.append(diff_tmp**0.5)
+
+    if answer != None:
+        plt.title("Jacobi method")
+        plt.ylabel("Difference")
+        plt.xlabel("Iterations")
+        
+        plt.minorticks_on()
+        plt.grid(which='major')
+        plt.grid(which='minor', linestyle=':')
+        
+        plt.plot(iterations, diff)
+        plt.savefig("images/Jacobi.png")
+        plt.show()
     
+    return X
+
+
+def solveSeidel(matrix_in: Matrix, right_side: list, iter_amnt: int, answer: list = None):
+    L, U, D = decomposeMatrix(matrix_in)
+    R = ((L + D) ** (-1)) * (-1) * U
+    F = ((L + D) ** (-1)) * right_side
+    X = [1 for i in range(L.width)]
+
+    iterations = [i for i in range(1, iter_amnt + 1)]
+    diff = []
+
+    for i in range(iter_amnt):
+        tmp = R * X
+        for i in range(L.width):
+            X[i] = tmp[i] + F[i]
+        
+        if answer != None:
+            diff_tmp = 0
+            for i in range(L.width):
+                diff_tmp += (X[i] - answer[i]) ** 2
+            diff.append(diff_tmp**0.5)
+
+    if answer != None:
+        plt.title("Siedel method")
+        plt.ylabel("Difference")
+        plt.xlabel("Iterations")
+        
+        plt.minorticks_on()
+        plt.grid(which='major')
+        plt.grid(which='minor', linestyle=':')
+
+        plt.plot(iterations, diff)
+        plt.savefig("images/Siedel.png")
+        plt.show()
+
+    return X
 
  
 n = 3
-
-
-
 matrix = Matrix(n, n, lambda i, j: 1 * (j == i) + (1 / (j + i)) * (i != j))
 right_side = [1 / i for i in range(1, n + 1)]
 
 resGauss = solveGauss(matrix, right_side)
-resJacobi = solveJacobi(matrix, right_side)
+print()
+
+resJacobi = solveJacobi(matrix, right_side, 20, resGauss)
+resSeidel = solveSeidel(matrix, right_side, 20, resGauss)
