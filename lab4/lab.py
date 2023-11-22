@@ -86,22 +86,53 @@ class SplineAprox:
 
         return (x - x0) ** 3 / (6 * h) * M1 + (x1 - x) ** 3 / (6 * h) * M0 + (x - x0) / h * (f1 - h**2 * M1 / 6) + (x1 - x) / h * (f0 - h**2 * M0 / 6)
 
-methods = [NewtonAprox(years, amount), SplineAprox(years, amount)]
-years_plot = [i for i in range(1910, 2020, 10)]
 
-for i in range(len(methods)):
-    population = [methods[i].calcValue(j) for j in years_plot]
+class LeastSquaresAprox:
+    def __init__(self, years, amount):
+        self.years = years
+        self.amount = amount
+        self.name = "LeastSquares"
 
-    plt.title(methods[i].getName() + " method for population 1910-2010")
-    plt.ylabel("Population")
-    plt.xlabel("Year")
+        phi = [lambda x: x ** 2, lambda x: x, lambda x: 1]
 
-    plt.minorticks_on()
-    plt.grid(which='major')
-    plt.grid(which='minor', linestyle=':')
+        matrix = np.array([[0.0 for _ in range(3)] for _ in range(3)])
+        for i in range(3):
+            for j in range(3):
+                for year in self.years:
+                    matrix[i][j] += phi[i](year) * phi[j](year)
+        rhs = [0.0 for _ in range(3)]
+        for i in range(3):
+            for j in range(len(self.years)):
+                rhs[i] += self.amount[j] * (self.years[j] ** (2 - i))
+    
+        self.coefs = np.linalg.solve(matrix, rhs)
 
-    plt.plot(years_plot, population)
-    plt.savefig("images/" + methods[i].getName())
-    plt.show()
+    def getName(self):
+        return self.name
 
-    print(f'population in 2010 according to {methods[i].getName()} = {methods[i].calcValue(2010)}')
+    def calcValue(self, x):
+        return self.coefs[0] * x**2 + self.coefs[1] * x + self.coefs[2]
+
+def main():
+    methods = [NewtonAprox(years, amount), SplineAprox(years, amount), LeastSquaresAprox(years, amount)]
+    years_plot = [i for i in range(1910, 2020, 10)]
+
+    for i in range(len(methods)):
+        population = [methods[i].calcValue(j) for j in years_plot]
+
+        plt.title(methods[i].getName() + " method for population 1910-2010")
+        plt.ylabel("Population")
+        plt.xlabel("Year")
+
+        plt.minorticks_on()
+        plt.grid(which='major')
+        plt.grid(which='minor', linestyle=':')
+
+        plt.plot(years_plot, population)
+        plt.savefig("images/" + methods[i].getName())
+        plt.show()
+
+        print(f'population in 2010 according to {methods[i].getName()} = {methods[i].calcValue(2010)}')
+
+if __name__ == '__main__':
+    main()
