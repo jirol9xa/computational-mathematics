@@ -1,11 +1,12 @@
 import matplotlib.pylab as plt
 import numpy as np
+import bisect
 
 
 data = {    
             1910 : 92228496, 
             1920 : 106021537,
-            1930 :123202624, 
+            1930 : 123202624, 
             1940 : 132164569,
             1950 : 151325798, 
             1960 : 179323175, 
@@ -45,7 +46,6 @@ class NewtonAprox:
                 tmp_res *= (x - self.years[j - 1])
             res += tmp_res
 
-        print("x = ", x, "value = ", res)
         return res
 
 
@@ -54,12 +54,37 @@ class SplineAprox:
         self.years = years
         self.amount = amount
         self.name = "Spline"    
+    
+        self.M_coefs = [0 for _ in range(len(years))]
+        
+        eq_matrix = np.array([[0 for _ in range(len(years) - 2)] for _ in range(len(years) - 2)])
+        for i in range(len(years) - 2):
+            for j in (-1, 0, 1):
+                if ((i + j) >= (len(years) - 2) or (i + j) < 0):
+                    continue
+                eq_matrix[i][i + j] = ((years[i + 1] - years[i]) * (j != 1) + (years[i + 2] - years[i + 1]) * (j != -1)) / (3 * (1 + (j != 0)))
+
+        rhs = [((amount[i + 2] - amount[i + 1]) / (years[i + 2] - years[i + 1]) - (amount[i + 1] - amount[i] / (years[i + 1] - years[i]))) for i in range(len(years) - 2)]
+        
+        tmp_coefs = np.linalg.solve(eq_matrix, rhs)
+        for i in range(len(years) - 2):
+            self.M_coefs[i + 1] = tmp_coefs[i]
 
     def getName(self):
         return self.name
 
     def calcValue(self, x):
+        pos = min(bisect.bisect_right(self.years, x), len(self.years) - 1)
+        
+        M0 = self.M_coefs[pos - 1]
+        M1 = self.M_coefs[pos]
+        x0 = self.years[pos - 1]
+        x1 = self.years[pos]
+        h = x1 - x0
+        f1 = self.amount[pos]
+        f0 = self.amount[pos - 1]
 
+        return (x - x0) ** 3 / (6 * h) * M1 + (x1 - x) ** 3 / (6 * h) * M0 + (x - x0) / h * (f1 - h**2 * M1 / 6) + (x1 - x) / h * (f0 - h**2 * M0 / 6)
 
 methods = [NewtonAprox(years, amount), SplineAprox(years, amount)]
 years_plot = [i for i in range(1910, 2020, 10)]
@@ -79,4 +104,4 @@ for i in range(len(methods)):
     plt.savefig("images/" + methods[i].getName())
     plt.show()
 
-    print("f(2010) = ", methods[i].calcValue(2010))
+    print(f'population in 2010 according to {methods[i].getName()} = {methods[i].calcValue(2010)}')
