@@ -27,9 +27,9 @@ def SimpsonMethod(data : dict[float, float]):
     x = list(data.keys())
     step = x[1] - x[0]
     values = list(data.values())
-    sum = values[0] + values[1]
+    sum = values[0] + values[len(values) - 1]
 
-    for i in range(2, len(values)):
+    for i in range(1, len(values) - 1):
         sum += (2 + 2 * (i % 2 == 1)) * values[i] 
 
     return sum * step * 1 / 3
