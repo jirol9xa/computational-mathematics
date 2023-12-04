@@ -46,11 +46,12 @@ def main():
     I_2h = TrapezoidMethod(data_2h)
     
     I_sim = SimpsonMethod(data)
+    I_r = I_h + (I_h - I_2h) / (2**2 - 1)
 
     print(f'I_h = {I_h}')
     print(f'I_2h = {I_2h}')
     print(f'I_sim = {I_sim}')
-
+    print(f'I_r = {I_r}')
 
 
 if __name__ == '__main__':
