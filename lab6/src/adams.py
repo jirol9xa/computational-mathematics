@@ -43,8 +43,7 @@ def NextU3(U, tau, f_arr):
 
 
 def AddRes(x_arr, y_arr, res):
-    x_arr = np.append(x_arr, res[0])
-    y_arr = np.append(y_arr, res[1])
+    return [np.append(x_arr, res[0]), np.append(y_arr, res[1])]
 
 def main():
     np.set_printoptions(floatmode='maxprec', suppress=True)
@@ -56,7 +55,7 @@ def main():
     u0 = [1.0, 0.0]
     points_amnt = 800
 
-    for point in range(points_amnt):
+    for _ in range(points_amnt):
         f_arr = []
         u = GenU(u0, rnd_size)
         x_arr = array([u[0]])
@@ -66,17 +65,20 @@ def main():
         for func in [NextU1, NextU2]:
             last = copy(res)
             res = func(last, T, f_arr)
-            AddRes(x_arr, y_arr, res) 
+            x_arr, y_arr = AddRes(x_arr, y_arr, res)
 
-        for t in range(600):
+        for _ in range(600):
             last = np.copy(res)
             res = NextU3(last, T, f_arr)
             if (res[0] * res[0] + res[1] * res[1]) > plt_rad:
                 break
-            AddRes(x_arr, y_arr, res)
+            x_arr, y_arr = AddRes(x_arr, y_arr, res)
 
-        print(f"\rPlotting point = {point}", end="")
         plt.plot(x_arr, y_arr, '.-', ms=1)
+    
+    plt.minorticks_on()
+    plt.grid(which='major')
+    plt.grid(which='minor', linestyle=':')
     plt.grid()
 
     print("\nDone")

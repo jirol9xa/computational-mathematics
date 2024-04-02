@@ -77,7 +77,7 @@ def main():
 
     points_amnt = 600
 
-    for point in range(points_amnt):
+    for _ in range(points_amnt):
         u = [u0[0] + rnd_size * rnd.randrange(-5, 500), u0[1] + rnd_size * rnd.randrange(-200, 200)]
         u_arr = [u]
 
@@ -87,14 +87,13 @@ def main():
             res = func(last_u, tau, u_arr)
             u_arr.append(res)   
 
-        for t in range(900):
+        for _ in range(900):
             res = FDNNextU(alpha_arr, beta, tau, F, u_arr)
             if (res[0] * res[0] + res[1] * res[1]) > plot_radius:
                 break
             u_arr.append(res)
 
         x_arr, y_arr = zip(*u_arr)
-        print(f"\rPlotting point = {point}", end="")
         plt.plot(x_arr, y_arr, '.-', ms=1)
     plt.grid()
 
