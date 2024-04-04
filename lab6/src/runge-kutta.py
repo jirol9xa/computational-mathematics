@@ -42,8 +42,8 @@ def K(U, s, tau, A):
 def main():
     np.set_printoptions(floatmode='maxprec', suppress=True)
 
-    plot_radius = 100
-    u0 = [-1.0, 0.0]
+    plt_rad = 100
+    u0 = [1.0, 0.0]
     points_amnt = 800
 
     A = np.empty((3, 3))
@@ -65,7 +65,7 @@ def main():
             last_u = [x_arr[-1], y_arr[-1]]
             k_arr = K(last_u, 3, T, A)
             res = NextU(last_u, T, b, k_arr)
-            if (res[0] * res[0] + res[1] * res[1]) > plot_radius:
+            if (res[0] * res[0] + res[1] * res[1]) > plt_rad:
                 break
             x_arr = np.append(x_arr, res[0])
             y_arr = np.append(y_arr, res[1])

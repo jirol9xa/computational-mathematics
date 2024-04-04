@@ -69,8 +69,8 @@ def main():
     tau = 1e-3
     rnd_size = 0.01
 
-    plot_radius = 100
-    u0 = [-1.0, 0.0]
+    plt_rad = 100
+    u0 = [1.0, 0.0]
 
     alpha_arr = [2.0/11.0, -9.0/11.0, 18.0/11.0]
     beta = 6.0/11.0
@@ -89,7 +89,7 @@ def main():
 
         for _ in range(900):
             res = FDNNextU(alpha_arr, beta, tau, F, u_arr)
-            if (res[0] * res[0] + res[1] * res[1]) > plot_radius:
+            if (res[0] * res[0] + res[1] * res[1]) > plt_rad:
                 break
             u_arr.append(res)
 
